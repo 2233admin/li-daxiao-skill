@@ -49,11 +49,7 @@ python fetch_screen.py           # 选股要用的个股数据（较慢）
 
 缓存写在 `scripts/data/`。之后 skill 会按需刷新；联网失败时用缓存，并注明数据截至哪天。
 
-数据来自 [akshare](https://github.com/akfamily/akshare)（东方财富、乐咕、新浪、中证指数等公开接口）和新浪实时行情。接口可能变动或限流，某一项拉不到时那一块会跳过，不影响其它。
-
-### 可选：本地 tdxcli
-
-设了环境变量 `TDXCLI_REPO`（指向本地 tdxcli 仓库）时，两融和新股会先走通达信 TQLEX，akshare 兜底。不设也能正常用。
+数据来自 [akshare](https://github.com/akfamily/akshare)（东方财富、乐咕、新浪、中证指数等公开接口）和新浪实时行情。接口可能变动或限流，某一项拉不到时那一块会跳过，不影响其它。akshare 改过函数名的由 scripts/akcompat.py 兼容，新旧版本都能跑。东方财富限流时（报 Push2RateLimitError）等几分钟再拉，别连着重试。
 
 ## 用法
 

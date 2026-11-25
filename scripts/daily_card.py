@@ -91,9 +91,8 @@ if _p('margin.csv'):
     ch20 = fz.iloc[-1] / fz.iloc[-21] - 1
     buy = m['融资买入额']
     wb = m['平均维持担保比例'].dropna()
-    src = m['来源'].fillna('akshare').iloc[-1] if '来源' in m else 'akshare'
     print(f"[F6] 融资余额 {fz.iloc[-1]:,.0f} 亿（2012起分位 {q(fz, fz.iloc[-1]):.0%}，近20日 {ch20:+.1%}）| 融资买入 {buy.iloc[-1]:,.0f} 亿（近1年分位 {q(buy.iloc[-250:], buy.iloc[-1]):.0%}）"
-          f"| 维持担保比例 {wb.iloc[-1]:.0f}%@{wb.index[-1].date()}（截至 {fz.index[-1].date()}，源 {src}）")
+          f"| 维持担保比例 {wb.iloc[-1]:.0f}%@{wb.index[-1].date()}（截至 {fz.index[-1].date()}）")
 # F5 新发偏股基金（主动：股票型 + 混合型-偏股；被动：指数型-股票）
 if _p('fund_new.csv'):
     fn = pd.read_csv(_p('fund_new.csv'), parse_dates=['成立日期'])
@@ -107,7 +106,7 @@ if _p('fund_new.csv'):
 # F7 新股：近 20 只上市新股首日破发率、近 30 天上市家数
 if _p('ipo.csv'):
     ip = pd.read_csv(_p('ipo.csv'))
-    ip['上市日期'] = pd.to_datetime(ip['上市日期'], format='mixed', errors='coerce')  # 东财带时分、TQLEX 不带
+    ip['上市日期'] = pd.to_datetime(ip['上市日期'], format='mixed', errors='coerce')  # 东财有时带时分
     ip = ip.dropna(subset=['上市日期', '首日收盘价', '发行价格']).sort_values('上市日期')
     ip = ip[ip['板块'] != '北交所']
     l20 = ip.tail(20)
