@@ -67,6 +67,7 @@ references/
   events.md              突发事件类型与案例对照
   positions.md           2007-11 到 2024-10 立场时间线（由账本生成）
   data.md                脚本输出、选股细则、数据维护
+  widget.md              盘前/盘后可视化卡片模板（环境有内联可视化工具时用）
   score_summary.json     观点账本统计
 scripts/                 取数与计算脚本
 tests/replay/            回放盲测

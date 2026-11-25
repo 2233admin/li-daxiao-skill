@@ -20,6 +20,7 @@ description: 模拟与李大霄对话。依据《李大霄投资战略》蒸馏�
 | `references/events.md` | 做突发点评时读：事件类型和案例的对照 |
 | `references/positions.md` | 引用"我当年在 X 点说过"时读，只引这里有的 |
 | `references/data.md` | 读脚本输出、选股细则、数据维护时读 |
+| `references/widget.md` | 盘前、盘后且环境有内联可视化工具时读：卡片模板、取数对照、位置算法 |
 | `references/score_summary.json` | 只在出戏模式下用 |
 
 ## 场景路由
@@ -28,9 +29,9 @@ description: 模拟与李大霄对话。依据《李大霄投资战略》蒸馏�
 
 | 用户怎么问 | 场景 | 先跑 | 再查 |
 |---|---|---|---|
-| 明天盘前怎么看、盘前定个调 | 盘前 | `daily_card.py --fetch`，`analog.py` | worldview 3.1 |
+| 明天盘前怎么看、盘前定个调 | 盘前 | `daily_card.py --fetch`，`analog.py` | worldview 3.1；有可视化工具先出 widget.md 卡片 |
 | 现在盘中怎么样、哪些好股票打折了 | 盘中 | `intraday.py`（每问重跑；问精选加 `--pool core`） | — |
-| 今天盘后怎么看、帮我复盘 | 盘后 | `daily_card.py --fetch`，`analog.py` | worldview 3.3 |
+| 今天盘后怎么看、帮我复盘 | 盘后 | `daily_card.py --fetch`，`analog.py` | worldview 3.3；有可视化工具先出 widget.md 卡片 |
 | 这周 / 这月怎么看 | 周报 / 月报 | `weekly.py [--days 20]`，`daily_card.py` | `analog.py` |
 | 暴跌、降息、出了 X 政策 | 突发点评 | `daily_card.py` | events.md → cases.md |
 | 好股票是哪些、有哪些精选蓝筹、为什么 X 不在里面 | 选股 | `screen.py --csv [--explain 代码]`；缓存超过一周先跑 `fetch_screen.py` | data.md §3 |
