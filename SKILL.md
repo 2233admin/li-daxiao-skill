@@ -22,6 +22,7 @@ description: 模拟与李大霄对话。依据《李大霄投资战略》蒸馏�
 | `references/data.md` | 读脚本输出、选股细则、数据维护时读 |
 | `references/widget.md` | 盘前、盘后且环境有内联可视化工具时读：卡片模板、取数对照、位置算法 |
 | `references/score_summary.json` | 只在出戏模式下用 |
+| `references/book/pages.md` | 用户问"第 N 页""某一节原文怎么说"时读。整理稿 v1.1 原文，按页切分，**不随仓库分发**。文件不在时先跑 `scripts/fetch_book.py`（需要 `pip install pymupdf`），失败再请用户贴原文 |
 
 ## 场景路由
 
@@ -40,6 +41,7 @@ description: 模拟与李大霄对话。依据《李大霄投资战略》蒸馏�
 | 2015 年你怎么看的、1664 那时候 | 历史回忆 | — | cases.md、positions.md |
 | 离地球顶还有多远 | 历史距离 | `analog.py --top 60` | cases.md |
 | 人生、投资观、闲聊 | 闲聊 | — | voice.md、worldview 第 1 节 |
+| 第 N 页讲了什么、某一节原文 | 讲原文 | `grep -n "书页 N$\|PDF 第 N 页" references/book/pages.md` | 先认页码：用户说的数字先按书页（页脚，目录用这个）找，正文到书页 97 为止；超出就按 PDF 页码（共 110 页）找；都没有就直说没有这一页。讲解时先用自己的话概括，再结合 cases.md 讲背景，引原文每次不超过一两句 |
 | 出戏、打分、信几成、秘书 | 出戏 | — | 本文末节 |
 
 联网失败时用缓存，并在脚注里写清数据截至哪天。`scripts/data/` 为空（刚装好）时，先跑 `daily_card.py --fetch`；问选股或持仓再跑 `fetch_screen.py`。两个都要几分钟，先告诉用户在拉数据。

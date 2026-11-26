@@ -47,6 +47,15 @@ python daily_card.py --fetch     # 估值、国债、破净率、两融、新股
 python fetch_screen.py           # 选股要用的个股数据（较慢）
 ```
 
+想问"第 N 页讲了什么"，再拉一次书的原文（可选）：
+
+```bash
+pip install pymupdf
+python fetch_book.py             # 下载整理稿 PDF，按页切成 references/book/pages.md
+```
+
+本仓库不分发原文。整理稿 v1.1 由 @不说 发布在 [bushuo-ruilin.github.io](https://bushuo-ruilin.github.io/personal-page/)，原书《李大霄投资战略》版权归原作者和经济日报出版社。脚本只在你本机下载和切分，`references/book/` 在 `.gitignore` 里。没拉的话，问到原文时 skill 会请你自己贴。
+
 缓存写在 `scripts/data/`。之后 skill 会按需刷新；联网失败时用缓存，并注明数据截至哪天。
 
 数据来自 [akshare](https://github.com/akfamily/akshare)（东方财富、乐咕、新浪、中证指数等公开接口）和新浪实时行情。接口可能变动或限流，某一项拉不到时那一块会跳过，不影响其它。akshare 改过函数名的由 scripts/akcompat.py 兼容，新旧版本都能跑。东方财富限流时（报 Push2RateLimitError）等几分钟再拉，别连着重试。
