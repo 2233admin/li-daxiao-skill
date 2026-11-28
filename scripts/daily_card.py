@@ -2,7 +2,7 @@
 
 usage: python daily_card.py [--fetch] [--data DIR]
   --fetch  用 akshare 重新拉数据到 DIR（默认 ./data）
-输出：各读数 + 隔夜外盘 + 分板块估值 + 四个信号灯（恐慌/狂热/国家队/巨量不涨）+ 一行估值基调。
+输出：各读数 + 隔夜外盘 + 海外尺子（港币、南向、跨境ETF溢价、席勒PE）+ 分板块估值 + 四个信号灯（恐慌/狂热/国家队/巨量不涨）+ 一行估值基调。
 补充源由 fetch_extra.py 拉取；文件缺失的块自动跳过。股东增减持明细未接。
 """
 import argparse, os, sys
@@ -160,6 +160,40 @@ if _p('overnight.csv'):
         # 条件线：以 A 股收盘日 A50 日盘收盘为基准；修复线 = 收回基准，偏弱线 = 基准 −0.8%（约 A50 日波动 1σ 的一半）
         base = float(a50['prev'].iloc[0]) if str(a50['date'].iloc[0]) > adate else float(a50['close'].iloc[0])
         print(f"[A50条件线] 基准 {base:,.0f}（{adate} 日盘收）｜偏弱线 {base * 0.992:,.0f}（-0.8%）｜修复线 {base:,.0f}｜现报 {a50['close'].iloc[0]:,.0f}")
+# 海外尺子：港币（R5）、南向、跨境 ETF 溢价（CB-16）、席勒 PE（CB-09）。缺文件就跳过
+ov = []
+if _p('hkd.csv'):
+    hk = pd.read_csv(_p('hkd.csv')).dropna().iloc[-1]
+    pos = (hk['close'] - 7.75) / 0.10  # 0 = 强方 7.75，1 = 弱方 7.85
+    side = '贴近强方，香港资金充裕' if pos < 0.2 else ('贴近弱方，资金偏紧' if pos > 0.8 else '区间中段')
+    ov.append(f"[R5港币] USDHKD {hk['close']:.4f}@{hk['date']}，在 7.75 强方 ~ 7.85 弱方之间的 {pos:.0%} 处（{side}）")
+if _p('south.csv'):
+    so = pd.read_csv(_p('south.csv'), parse_dates=['date']).set_index('date')['net'].astype(float)
+    s20 = so.rolling(20).sum().dropna()
+    s20 = s20[s20.index >= s20.index[-1] - pd.DateOffset(years=3)]
+    ov.append(f"[南向] {so.index[-1]:%m-%d} 净买 {so.iloc[-1]:+.0f} 亿 | 近5日 {so.iloc[-5:].sum():+.0f} 亿 | "
+              f"近20日 {s20.iloc[-1]:+.0f} 亿（近3年分位 {q(s20, s20.iloc[-1]):.0%}）")
+if _p('qdii.csv'):
+    qd = pd.read_csv(_p('qdii.csv'))
+    qd = qd[qd['date'] == qd['date'].max()]
+    parts = []
+    for g, k in qd.groupby('group', sort=False):
+        w = (k['prem'] * k['amount']).sum() / k['amount'].sum()
+        top = k.loc[k['prem'].idxmax()]
+        parts.append(f"{g} {len(k)}只 加权 {w:+.1%} 最高 {top['name']} {top['prem']:+.1%}")
+    hot = int((qd['prem'] > 0.10).sum())
+    ov.append(f"[CB-16跨境ETF溢价] {qd['date'].iloc[0]} " + ' | '.join(parts)
+              + f"｜溢价>10% 共 {hot} 只" + ('（过热信号：热气球高度）' if hot else ''))
+if _p('cape.csv'):
+    cp = pd.read_csv(_p('cape.csv'))
+    c = cp['cape'].astype(float)
+    ref = dict(zip(cp['date'], c))
+    hist = '，'.join(f"{lb} {ref[d]:.1f}" for lb, d in (('1929-09', '1929-09'), ('2000-01', '2000-01'), ('2007-10', '2007-10'),
+                                                         ('2021-09', '2021-09')) if d in ref)
+    ov.append(f"[CB-09席勒PE] 标普500 {c.iloc[-1]:.1f}@{cp['date'].iloc[-1]}（{cp['date'].iloc[0][:4]}起分位 {q(c, c.iloc[-1]):.0%}；"
+              f"历史最高 {c.max():.1f}@{cp.loc[c.idxmax(), 'date']}；对照 {hist}）")
+for line in ov:
+    print(line)
 # 分指数估值：乐咕月末历史 2005 起分位；中证官方只有近 20 日，给水平和股息率−10Y
 if _p('sector_lg.csv'):
     sl = pd.read_csv(_p('sector_lg.csv'))
